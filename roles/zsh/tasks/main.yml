@@ -1,0 +1,34 @@
+- name: ensure the zsh working directory
+  tags:
+    - zsh
+  command: 'mkdir -p {{ zsh_working_dir }}'
+  notify:
+    - cleanup the zsh working directory
+
+- name: check required packages
+  tags:
+    - zsh
+  yum: name=$item state=installed
+  with_items: $zsh_required_packages
+  when: skip_yum is not defined
+
+- name: fetch the archive
+  tags:
+    - zsh
+  get_url: url={{ zsh_url }}
+      dest='{{ zsh_working_dir }}/zsh-{{ zsh_version }}.tar.bz2'
+
+- name: extract from the archive
+  tags:
+    - zsh
+  command: tar -jx --no-same-owner -f zsh-{{ zsh_version }}.tar.bz2
+      chdir={{ zsh_working_dir }}
+
+- name: configure/make/make install
+  tags:
+    - zsh
+  command: $item chdir='{{ zsh_working_dir }}/zsh-{{ zsh_version }}' #'
+  with_items:
+    - './configure {{ zsh_configure_options }}'
+    - make
+    - make install

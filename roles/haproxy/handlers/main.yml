@@ -1,0 +1,11 @@
+-
+  name: clean up the working directory
+  file: path={{ _haproxy_working_dir }} state=absent
+
+-
+  name: reload haproxy
+  service: name={{ _haproxy_name }} state=reloaded
+
+-
+  name: restart haproxy
+  service: name={{ _haproxy_name }} state=restarted

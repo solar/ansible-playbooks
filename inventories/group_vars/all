@@ -1,0 +1,4 @@
+templates_base: '.'
+files_base: '.'
+
+# vim: ft=yaml

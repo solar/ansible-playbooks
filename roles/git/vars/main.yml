@@ -1,0 +1,26 @@
+_git_working_dir: '{{ git_working_dir|d(tmp_dir ~ "/ansible/git") }}'
+_git_version: '{{ git_version|d("1.8.3.3") }}'
+_git_url: '{{ git_url|d("http://git-core.googlecode.com/files/git-" ~ _git_version ~ ".tar.gz") }}'
+
+_git_default_configure_options:
+    --with-openssl
+    --with-libpcre
+    --with-expat
+    --with-curl
+
+_git_configure_options: '{{ git_configure_options|d(_git_default_configure_options) }}'
+
+_git_default_required_packages:
+  - autoconf
+  - diffutils
+  - gettext
+  - openssl-devel
+  - pcre-devel
+  - perl
+  - perl-ExtUtils-MakeMaker
+  - curl-devel
+  - expat-devel
+
+_git_required_packages: '{{ git_required_packages|d(_git_default_required_packages)|join(",") }}'
+
+# vim: ft=yaml

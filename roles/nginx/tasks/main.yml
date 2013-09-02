@@ -1,0 +1,37 @@
+-
+  name: ensure the log directory
+  tags:
+    - 'nginx-install'
+    - 'nginx-config'
+  command: 'mkdir -p {{ log_dir }}'
+
+-
+  name: install nginx
+  tags:
+    - 'nginx-install'
+  yum: name=nginx state=installed
+  notify:
+    - start nginx
+
+-
+  name: enable nginx
+  tags:
+    - 'nginx-install'
+  command: chkconfig nginx on
+
+-
+  name: nginx config
+  tags:
+    - 'nginx-config'
+  template: src='{{ templates_base }}/nginx.conf'
+      dest={{ config_file }}
+  register: nginx_config
+
+-
+  name: check nginx config
+  tags:
+    - 'nginx-config'
+  command: service nginx configtest
+  when: nginx_config.changed
+  notify:
+    - reload nginx

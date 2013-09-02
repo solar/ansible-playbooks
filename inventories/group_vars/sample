@@ -1,0 +1,16 @@
+users:
+  -
+    name: solar
+    pubkeys: pubkeys/solar
+
+templates_base: 'sample'
+
+# ephemeral disks
+ec2_setup_mount:
+  -
+    src: /dev/xvdb
+    fstype: ext4
+    name: '{{ var_dir }}'
+    opts: defaults
+
+# vim: ft=yaml

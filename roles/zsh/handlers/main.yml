@@ -1,0 +1,3 @@
+-
+  name: cleanup the zsh working directory
+  file: path={{ zsh_working_dir }} state=absent

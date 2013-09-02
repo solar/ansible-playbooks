@@ -1,0 +1,52 @@
+-
+  name: add insprout group
+  tags:
+    - setup
+  group: name=insprout state=present
+
+-
+  name: add users
+  tags:
+    - setup
+  user: name={{ item.name }} group=insprout groups=wheel state=present
+  with_items: users
+
+-
+  name: set authorized_keys
+  tags:
+    - setup
+  authorized_key: user={{ item.name }} key="{{ lookup('file', item.pubkeys) }}" #"
+  with_items: users
+
+-
+  name: update sudoers
+  tags:
+    - setup
+  lineinfile: dest=/etc/sudoers
+      regexp='^%wheel'
+      line='%wheel ALL=(ALL) NOPASSWD{{ ':' }} ALL'
+      state=present
+
+-
+  name: set timezone
+  tags:
+    - setup
+  shell: rm /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
+-
+  name: rsyslog config
+  tags:
+    - setup
+  tags:
+    - rsyslog
+  template: src='{{ templates_base }}/rsyslog.conf' dest={{ rsyslog_conf }}
+  notify:
+    - restart rsyslog
+
+-
+  name: logrotate config
+  tags:
+    - setup
+  tags:
+    - logrotate
+  template: src='{{ templates_base }}/logrotate.conf' dest={{ logrotate_conf }}

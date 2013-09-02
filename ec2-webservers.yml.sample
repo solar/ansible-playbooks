@@ -1,0 +1,25 @@
+- name: setup ec2-instances
+  hosts: local
+  vars:
+    id: 'webservers'
+    security_group: 'default'
+    ami: 'ami-sample'
+    instance_type: 'm1.small'
+    key_name: 'default'
+    region: 'ap-northeast-1'
+  roles:
+    - ec2
+
+- name: setup web servers
+  hosts: launched
+  sudo: true
+
+  roles:
+    - ec2-setup
+    - setup
+    - git
+    - zsh
+    - vim
+    - haproxy
+    - nginx
+    - php

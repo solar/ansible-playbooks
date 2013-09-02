@@ -1,0 +1,17 @@
+[all:children]
+local
+remote
+
+[remote:children]
+ec2
+
+[ec2:children]
+sample
+
+[sample:children]
+launched
+
+[launched]
+
+[local]
+localhost ansible_connection=local

@@ -1,0 +1,18 @@
+_vim_working_dir: '{{ vim_working_dir|d(tmp_dir ~ "/ansible/vim") }}'
+
+_vim_version: '{{ vim_version|d(7.4) }}'
+
+_vim_url: '{{ vim_url|d("ftp://ftp.vim.org/pub/vim/unix/vim-" ~ _vim_version ~ ".tar.bz2") }}'
+
+_vim_configure_options: '{{ vim_configure_options|d(_vim_default_configure_options) }}'
+
+_vim_required_packages: '{{ vim_required_packages|d(_vim_default_required_packages)|join(",") }}'
+
+_vim_default_configure_options:
+  --enable-multibyte
+  --with-features-huge
+
+_vim_default_required_packages:
+  - make
+  - gcc
+  - readline-devel

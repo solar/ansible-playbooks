@@ -1,0 +1,6 @@
+var_dir: /media/ephemeral0
+
+log_dir_base: '{{ var_dir }}/log'
+tmp_dir: '{{ var_dir }}/tmp'
+
+# vim: ft=yaml

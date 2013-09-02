@@ -1,0 +1,112 @@
+-
+  name: ensure the php working directory
+  tags:
+    - php-install
+    - php-config
+  command: 'mkdir -p {{ _php_working_dir }}'
+  notify:
+    - cleanup the php working directory
+
+-
+  name: ensure the config directories
+  tags:
+    - php-install
+    - php-config
+  file: path={{ _php_config_dir }} state=directory
+      owner=root group=root mode=0755 recurse=yes
+
+-
+  name: ensure the php-fpm log directory
+  tags:
+    - php-install
+  file: path={{ _php_fpm_log_dir }} state=directory
+      owner=root group=root mode=0755 recurse=yes
+  when: _php_fpm_name
+
+-
+  name: check required packages
+  tags:
+    - php-install
+  yum: name={{ item }} state=installed
+  with_items: _php_required_packages.split(',')
+  when: skip_yum is not defined
+
+-
+  name: fetch the archive
+  tags:
+    - php-install
+  get_url: url={{ _php_url }} dest={{ _php_working_dir }}
+  register: _php_fetched_archive
+
+-
+  name: extract from the archive
+  tags:
+    - php-install
+  command: tar -jx --no-same-owner -f {{ _php_fetched_archive.dest }}
+      chdir={{ _php_working_dir }}
+
+-
+  name: find the extracted directory
+  tags:
+    - php-install
+  command: find {{ _php_working_dir }} -mindepth 1 -maxdepth 1 -type d -name 'php*'
+  register: _php_extracted_dir
+
+-
+  name: configure/make/make install
+  tags:
+    - 'php-install'
+  command: '{{ item }} chdir={{ _php_extracted_dir.stdout }}'
+  with_items:
+    - ./configure {{ _php_configure_options }}
+    - make
+    - make install
+  notify:
+    - restart php-fpm
+
+-
+  name: php config
+  tags:
+    - 'php-config'
+  template: src={{ _php_config_template }} dest={{ _php_config_path }}
+      owner=root group=root
+  notify:
+    - reload php-fpm
+
+-
+  name: php-fpm config
+  tags:
+    - 'php-config'
+  template: src={{ _php_fpm_config_template }} dest={{ _php_fpm_config_path }}
+      owner=root group=root
+  register: _php_fpm_config_updated
+  when: _php_fpm_name
+
+-
+  name: test php-fpm config
+  tags:
+    - 'php-config'
+  command: '{{ _php_prefix }}/sbin/php-fpm -t -y {{ _php_config_dir }}/php-fpm.conf'
+  when: _php_fpm_config_updated.changed
+  notify:
+    - reload php-fpm
+
+-
+  name: php-fpm init file
+  tags:
+    - php-install
+  template: src={{ _php_fpm_init_template }} dest={{ _php_fpm_init_path }}
+      owner=root group=root mode=0755
+  when: _php_fpm_name
+  notify:
+    - restart php-fpm
+
+-
+  name: add php-fpm
+  tags:
+    - php-install
+  command: $item
+  with_items:
+    - chkconfig --add {{ _php_fpm_name }}
+    - chkconfig {{ _php_fpm_name }}
+  when: _php_fpm_name

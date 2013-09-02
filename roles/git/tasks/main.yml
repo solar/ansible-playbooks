@@ -1,0 +1,42 @@
+- name: ensure the git working directory
+  tags:
+    - git
+  command: mkdir -p {{ _git_working_dir }}
+  notify:
+    - cleanup the git working directory
+
+- name: check required packages
+  tags:
+    - git
+  yum: name={{ item }} state=installed
+  with_items: _git_required_packages.split()
+  when: skip_yum is not defined
+
+- name: fetch the archive
+  tags:
+    - git
+  get_url: url={{ _git_url }} dest={{ _git_working_dir ~ '/' }}
+  register: _git_fetched_archive
+
+- name: extract from the archive
+  tags:
+    - git
+  command: tar -zx --no-same-owner -f {{ _git_fetched_archive.dest }}
+      chdir={{ _git_working_dir }}
+
+-
+  name: find the extracted directory
+  tags:
+    - git
+  command: find {{ _git_working_dir }} -mindepth 1 -maxdepth 1 -type d -name 'git*'
+  register: _git_extracted_dir
+
+- name: configure/make/make install
+  tags:
+    - git
+  command: '{{ item }} chdir={{ _git_extracted_dir.stdout }}'
+  with_items:
+    - make clean
+    - ./configure {{ _git_configure_options }}
+    - make
+    - make install

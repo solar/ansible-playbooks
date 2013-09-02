@@ -1,0 +1,27 @@
+-
+  name: launch an instance
+  tags:
+    - ec2
+  ec2: id=$id
+      group={{ security_group }}
+      image={{ ami }}
+      instance_type={{ instance_type }}
+      key_name={{ key_name }}
+      region={{ region }}
+      wait=true
+  register: _ec2_launched
+
+-
+  name: Add new instance to host group
+  tags:
+    - ec2
+  add_host: hostname={{ item.public_ip }} groupname=launched
+  with_items: _ec2_launched.instances
+
+-
+  name: Wait for SSH to running
+  tags:
+    - ec2
+  wait_for: host={{ item.public_dns_name }} port=22 timeout=320
+      state=started
+  with_items: _ec2_launched.instances

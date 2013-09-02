@@ -1,0 +1,53 @@
+-
+  name: ensure the vim working directory
+  tags:
+    - vim
+  command: mkdir -p {{ _vim_working_dir }}
+  notify:
+    - cleanup the vim working directory
+
+-
+  name: check required packages
+  tags:
+    - vim
+  yum: name={{ item }} state=installed
+  with_items: _vim_required_packages.split(',')
+  when: skip_yum is not defined
+
+-
+  name: fetch the archive
+  tags:
+    - vim
+  get_url: url={{ _vim_url }}
+      dest={{ _vim_working_dir }}/
+  register: _vim_fetched_archive
+
+-
+  name: extract from the archive
+  tags:
+    - vim
+  command: tar -jx --no-same-owner -f {{ _vim_fetched_archive.dest }}
+      chdir={{ _vim_working_dir }}
+
+-
+  name: find the extracted directory
+  tags:
+    - vim
+  command: find {{ _vim_working_dir }} -mindepth 1 -maxdepth 1 -type d -name 'vim*'
+  register: _vim_extracted_dir
+
+-
+  name: configure/make/make install
+  tags:
+    - vim
+  command: '{{ item }} chdir={{ _vim_extracted_dir.stdout }}'
+  with_items:
+    - ./configure {{ _vim_configure_options }}
+    - make
+    - make install
+
+-
+  name: "remove yum's vim"
+  tags:
+    - vim
+  yum: name=vim-enhanced state=absent

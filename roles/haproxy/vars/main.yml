@@ -1,0 +1,32 @@
+_haproxy_user: '{{ haproxy_user|d("haproxy") }}'
+_haproxy_group: '{{ haproxy_group|d("haproxy") }}'
+
+_haproxy_name: '{{ haproxy_name|d("haproxy") }}'
+
+_haproxy_log_dir: '{{ haproxy_log_dir|d(log_dir_base ~ "/" ~ _haproxy_name) }}'
+_haproxy_log_file: '{{ haproxy_log_file|d(_haproxy_log_dir ~ "/" ~ _haproxy_name ~ ".log") }}'
+
+_haproxy_home_dir: '{{ haproxy_home_dir|d(var_dir ~ "/" ~ _haproxy_name) }}'
+
+_haproxy_config_dir: '{{ haproxy_config_dir|d(etc_dir ~ "/" ~ _haproxy_name) }}'
+_haproxy_config_file: '{{ haproxy_config_file|d(_haproxy_config_dir ~ "/" ~ _haproxy_name ~ ".cfg") }}'
+_haproxy_config_template: '{{ haproxy_config_template|d(templates_base ~ "/haproxy.cfg") }}'
+
+_haproxy_working_dir: '{{ haproxy_working_dir|d(tmp_dir ~ "/ansible/" ~ _haproxy_name) }}'
+
+_haproxy_url: '{{ haproxy_url|d("http://haproxy.1wt.eu/download/1.5/src/devel/haproxy-1.5-dev19.tar.gz") }}'
+
+_haproxy_install_options: '{{ haproxy_install_options|d("TARGET=linux2628 CPU=native USE_PCRE=1 USE_OPENSSL=1 USE_ZLIB=1") }}'
+
+_haproxy_required_packages: '{{ haproxy_required_packages|d(_haproxy_default_required_packages)|join(",") }}'
+
+_haproxy_default_required_packages:
+  - gcc
+  - openssl-devel
+  - pcre-devel
+  - zlib-devel
+
+_haproxy_init_from: '{{ haproxy_init_from|d(files_base ~ "/haproxy.init") }}'
+_haproxy_init_to: '{{ haproxy_init_to|d(init_dir ~ "/" ~ _haproxy_name) }}'
+
+_haproxy_syslog_facility: '{{ haproxy_syslog_facility|d("local0") }}'

@@ -1,0 +1,23 @@
+-
+  name: ensure the working directory
+  tags:
+    - haproxy-install
+    - haproxy-config
+  command: mkdir -p {{ _haproxy_working_dir }}
+  notify:
+    - clean up the working directory
+
+-
+  name: ensure directories
+  tags:
+    - haproxy-install
+    - haproxy-config
+  file: path={{ item }} state=directory
+      owner=root group=root mode=0755 recurse=yes
+  with_items:
+    - '{{ _haproxy_log_dir }}'
+    - '{{ _haproxy_home_dir }}'
+    - '{{ _haproxy_config_dir }}'
+
+- include: install.yml
+- include: config.yml

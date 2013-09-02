@@ -1,0 +1,51 @@
+_php_working_dir: '{{ php_working_dir|d(tmp_dir ~ "/ansible/php") }}'
+
+_php_version: '{{ php_version|d("5.5.3") }}'
+_php_config_dir: '{{ php_config_dir|d(etc_dir ~ "/php") }}'
+
+_php_config_template: '{{ php_config_template|d(templates_base ~ "/php.ini") }}'
+_php_config_path: '{{ php_config_path|d(_php_config_dir ~ "/php.ini") }}'
+
+_php_fpm_name: '{{ php_fpm_name|d("php-fpm") }}'
+
+_php_fpm_log_dir: '{{ php_fpm_log_dir|d(log_dir_base ~ "/" ~ _php_fpm_name) }}'
+_php_fpm_pid: '{{ php_fpm_pid|d("/var/run/" ~ _php_fpm_name ~ ".pid") }}'
+
+_php_fpm_config_template: '{{ php_fpm_config_template|d(templates_base ~ "/php-fpm.conf") }}'
+_php_fpm_config_path: '{{ php_fpm_config_path|d(_php_config_dir ~ "/php-fpm.conf") }}'
+
+_php_fpm_init_template: '{{ php_fpm_init_template|d(templates_base ~ "/php-fpm.init") }}'
+_php_fpm_init_path: '{{ php_fpm_init_path|d(init_dir ~ "/" ~ _php_fpm_name) }}'
+
+_php_url: '{{ php_url|d("http://jp1.php.net/get/php-" ~ _php_version ~ ".tar.bz2/from/this/mirror") }}'
+
+_php_prefix: '{{ php_prefix|d("/usr/local") }}'
+
+_php_default_configure_options:
+  --enable-fpm
+  '--prefix={{ _php_prefix }}'
+  --enable-mbstring
+  --with-gd
+  --with-jpeg-dir
+  --with-png-dir
+  --with-zlib
+  --with-openssl
+  --with-mysql
+  --with-curl
+  --with-libdir=lib64
+  --with-pdo-mysql
+  '--sysconfdir={{ _php_config_dir }}'
+  '--with-config-file-path={{ _php_config_dir }}'
+
+_php_configure_options: '{{ php_configure_options|d(_php_default_configure_options) }}'
+
+_php_default_required_packages:
+  - bison-devel
+  - libcurl-devel
+  - libxml2-devel
+  - libjpeg-devel
+  - libpng-devel
+  - openssl-devel
+  - re2c
+
+_php_required_packages: '{{ php_required_packages|d(_php_default_required_packages)|join(",") }}'

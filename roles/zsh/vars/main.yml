@@ -1,0 +1,19 @@
+zsh_working_dir: '{{ tmp_dir }}/ansible/zsh'
+zsh_version: 5.0.2
+
+zsh_url: "http://jaist.dl.sourceforge.net/project/zsh/zsh/{{ zsh_version }}/zsh-{{ zsh_version }}.tar.bz2"
+
+zsh_configure_options:
+    --enable-cap
+    --enable-pcre
+    --enable-multibyte
+
+zsh_required_packages:
+  - gcc
+  - make
+  - ncurses-devel
+  - pcre-devel
+  - readline-devel
+  - zlib-devel
+
+# zsh: ft=yaml

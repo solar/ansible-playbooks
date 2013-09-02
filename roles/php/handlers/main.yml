@@ -1,0 +1,13 @@
+-
+  name: cleanup the php working directory
+  file: path={{ _php_working_dir }} state=absent
+
+-
+  name: reload php-fpm
+  service: name={{ _php_fpm_name }} state=reloaded
+  when: _php_fpm_name
+
+-
+  name: restart php-fpm
+  service: name={{ _php_fpm_name }} state=restarted
+  when: _php_fpm_name

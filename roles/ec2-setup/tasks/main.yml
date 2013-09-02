@@ -1,0 +1,35 @@
+-
+  name: mount filesystems
+  tags:
+    - 'ec2-setup'
+  mount: src={{ item.src }}
+      fstype={{ item.fstype }}
+      name={{ item.name }}
+      opts={{ item.opts }}
+      state=mounted
+  with_items: ec2_setup_mount
+  when: ec2_setup_mount is defined
+  register: _ec2_setup_mounted
+
+-
+  name: update all yum packages
+  tags:
+    - 'ec2-setup'
+  command: yum update
+  when: _ec2_setup_mounted.changed
+
+-
+  name: reboot
+  tags:
+    - 'ec2-setup'
+  command: reboot
+  when: _ec2_setup_mounted.changed
+
+-
+  name: waiting for restarting
+  tags:
+    - 'ec2-setup'
+  sudo: false
+  local_action: wait_for
+      host={{ inventory_hostname }} port=22 delay=20 timeout=320
+  when: _ec2_setup_mounted.changed

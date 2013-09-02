@@ -1,0 +1,67 @@
+-
+  name: create group
+  tags:
+    - haproxy-install
+  group: name={{ _haproxy_group }} system=yes state=present
+
+-
+  name: create user
+  tags:
+    - haproxy-install
+  user: name={{ _haproxy_user }} system=yes
+      group={{ _haproxy_group }} home={{ _haproxy_home_dir }}
+      shell=/sbin/nologin createhome=no state=present
+
+-
+  name: required packages
+  tags:
+    - haproxy-install
+  yum: name={{ item }} state=present
+  with_items: _haproxy_required_packages.split(',')
+  when: skip_yum is not defined
+
+-
+  name: fetch the archive
+  tags:
+    - haproxy-install
+  get_url: url={{ _haproxy_url }} dest={{ _haproxy_working_dir ~ '/' }}
+  register: _haproxy_fetched_archive
+
+- name: extract the archive
+  tags:
+    - haproxy-install
+  command: tar -zx --no-same-owner -f {{ _haproxy_fetched_archive.dest }}
+      chdir={{ _haproxy_working_dir }}
+
+-
+  name: find the extracted directory
+  tags:
+    - haproxy-install
+  command: find {{ _haproxy_working_dir }} -mindepth 1 -type d -name 'haproxy*'
+  register: _haproxy_extracted_dir
+
+- name: install
+  tags:
+    - haproxy-install
+  shell: $item chdir={{ _haproxy_extracted_dir.stdout }}
+  with_items:
+    - make {{ _haproxy_install_options }}
+    - make install
+  notify:
+    - restart haproxy
+
+-
+  name: upload the init file
+  tags:
+    - haproxy-install
+  copy: src={{ _haproxy_init_from }} dest={{ _haproxy_init_to }}
+      mode=0755 owner=root group=root
+
+-
+  name: add as service
+  tags:
+    - haproxy-install
+  command: '{{ item }}'
+  with_items:
+    - chkconfig --add {{ _haproxy_name }}
+    - chkconfig {{ _haproxy_name }} on

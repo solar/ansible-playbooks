@@ -1,0 +1,10 @@
+etc_dir: /etc
+init_dir: /etc/init.d
+
+log_dir_base: /var/log
+tmp_dir: /tmp
+
+rsyslog_conf: '/etc/rsyslog.conf'
+logrotate_conf: '/etc/logrotate.conf'
+
+# vim: ft=yaml
